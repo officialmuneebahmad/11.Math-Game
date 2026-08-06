@@ -9,11 +9,12 @@ import { playSound } from '../utils/audio';
 const Game = () => {
   const { level } = useParams<{ level: Level }>();
   const navigate = useNavigate();
-  const { updateLevelProgress, addPoints, gameMode } = useGameStore();
+  const { updateLevelProgress, addPoints, gameMode, isPaid, customTimeLimit } = useGameStore();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+  const initialTime = isPaid ? customTimeLimit : 300;
+  const [timeLeft, setTimeLeft] = useState(initialTime);
   const [isGameOver, setIsGameOver] = useState(false);
 
   const [inputValue, setInputValue] = useState('');
@@ -33,12 +34,12 @@ const Game = () => {
         state: {
           level,
           stats: sessionStats,
-          timeSpent: gameMode === 'timed' ? 300 - timeLeft : sessionStats.total * 5, // Approximation for untimed
+          timeSpent: gameMode === 'timed' ? initialTime - timeLeft : sessionStats.total * 5, // Approximation for untimed
           maxCombo: combo
         }
       });
     }, 1500);
-  }, [combo, level, navigate, sessionStats, timeLeft, gameMode]);
+  }, [combo, level, navigate, sessionStats, timeLeft, gameMode, initialTime]);
 
   // Initialize questions
   useEffect(() => {
@@ -203,10 +204,16 @@ const Game = () => {
                 <input
                   ref={inputRef}
                   type="text"
+                  inputMode="numeric"
+                  pattern="-?[0-9]*"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(e) => {
+                    // Only allow digits and optional leading minus sign
+                    const filtered = e.target.value.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, '');
+                    setInputValue(filtered);
+                  }}
                   disabled={feedback !== null}
-                  placeholder="Type answer..."
+                  placeholder="Type number..."
                   className={`
                     w-full text-center text-4xl font-bold py-4 rounded-2xl border-4 outline-none transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-white
                     ${feedback === null ? 'border-slate-200 dark:border-slate-700 focus:border-indigo-500' : ''}
@@ -214,7 +221,9 @@ const Game = () => {
                     ${feedback === 'incorrect' ? 'border-rose-500 text-rose-500' : ''}
                   `}
                   autoComplete="off"
+                  title="Numbers only"
                 />
+                <p className="text-center text-xs text-slate-400 mt-2">Numbers only &bull; Press Enter to submit</p>
               </form>
             )}
           </motion.div>

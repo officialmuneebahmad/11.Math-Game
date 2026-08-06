@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -10,7 +10,6 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { streak } = useGameStore();
-  const resultRef = useRef<HTMLDivElement>(null);
 
   const state = location.state as {
     level: string;
@@ -53,11 +52,16 @@ const Results = () => {
   const formatTime = (seconds: number) => `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 
   const handleShare = async () => {
-    if (!resultRef.current) return;
-    const dataUrl = await generateShareImage(resultRef.current);
-    if (dataUrl) {
-      shareResult(dataUrl, `I just scored ${accuracy}% on ${level} mode in MathStreak! Streak: ${streak} 🔥`);
-    }
+    const dataUrl = await generateShareImage({
+      level,
+      accuracy,
+      correct: stats.correct,
+      total: stats.total,
+      timeSpent,
+      streak,
+      maxCombo,
+    });
+    shareResult(dataUrl, `I scored ${accuracy}% on MathStreak ${level} level! 🔥 Streak: ${streak} days`);
   };
 
   return (
@@ -67,7 +71,7 @@ const Results = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-lg bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl border border-slate-100 dark:border-slate-700"
       >
-        <div ref={resultRef} className="text-center mb-8 bg-white dark:bg-slate-800 pb-2">
+        <div className="text-center mb-8 bg-white dark:bg-slate-800 pb-2">
           <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <Trophy size={40} className="text-emerald-500" />
           </div>

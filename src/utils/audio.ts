@@ -1,7 +1,8 @@
+import { useGameStore } from '../store/useGameStore';
+
 // Define frequencies for synthesized sounds to keep bundle size small and responsive without assets
 const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
 let audioCtx: AudioContext | null = null;
-let isMuted = false;
 
 const initAudio = () => {
   if (!audioCtx) {
@@ -13,10 +14,11 @@ const initAudio = () => {
 };
 
 export const toggleMute = (muted: boolean) => {
-  isMuted = muted;
+  // Kept for backward compatibility, but state is now read directly from useGameStore
 };
 
 const playTone = (frequency: number, type: OscillatorType, duration: number, volume = 0.1) => {
+  const isMuted = useGameStore.getState().isMuted;
   if (isMuted) return;
   initAudio();
   if (!audioCtx) return;
@@ -56,6 +58,7 @@ export const playSound = {
     playTone(800, 'sine', 0.05, 0.05);
   },
   loveTap: () => {
+    const isMuted = useGameStore.getState().isMuted;
     if (isMuted) return;
     initAudio();
     if (!audioCtx) return;
