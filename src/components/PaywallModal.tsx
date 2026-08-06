@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { X, Lock, CheckCircle2, Key, Check, AlertCircle } from 'lucide-react';
 import { useLemonSqueezy } from '../utils/lemonsqueezy';
@@ -51,7 +52,7 @@ const PaywallModal = ({ isOpen, onClose, level, levelName }: PaywallModalProps) 
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0 }}
@@ -156,7 +157,8 @@ const PaywallModal = ({ isOpen, onClose, level, levelName }: PaywallModalProps) 
           </p>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
