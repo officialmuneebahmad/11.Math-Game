@@ -13,9 +13,9 @@ const initAudio = () => {
   }
 };
 
-export const toggleMute = (muted: boolean) => {
+// export const toggleMute = (muted: boolean) => {
   // Kept for backward compatibility, but state is now read directly from useGameStore
-};
+// };
 
 const playTone = (frequency: number, type: OscillatorType, duration: number, volume = 0.1) => {
   const isMuted = useGameStore.getState().isMuted;
