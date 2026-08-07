@@ -198,7 +198,7 @@ export const useGameStore = create<GameState>()(
         } else if (/^MS-ADP-[A-Z0-9]{4,}$/.test(trimmedKey) || trimmedKey === 'MS-ADP-TEST') {
           unlockedLevels = ['hard'];
           message = 'Advanced Level unlocked successfully!';
-        } else if (/^MS-ALL-[A-Z0-9]{4,}$/.test(trimmedKey) || trimmedKey === 'MS-ALL-TEST' || trimmedKey === 'MS-ALL-POLAR') {
+        } else if (/^MS-ALL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(trimmedKey) || trimmedKey === 'MS-ALL-TEST' || trimmedKey === 'MS-ALL-POLAR') {
           unlockedLevels = ['easy', 'medium', 'hard'];
           message = 'All Levels Bundle unlocked successfully! You are now a Pro!';
         } else {

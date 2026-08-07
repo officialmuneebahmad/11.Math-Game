@@ -129,7 +129,7 @@ const PaywallModal = ({ isOpen, onClose, level, levelName: _levelName }: Paywall
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="e.g. MS-ALL-XXXX"
+                      placeholder="e.g. MS-ALL-XXXX-XXXX-XXXX"
                       value={licenseKey}
                       onChange={(e) => setLicenseKey(e.target.value)}
                       className="flex-grow px-3 py-2 border rounded-xl outline-none focus:border-indigo-500 text-sm bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
