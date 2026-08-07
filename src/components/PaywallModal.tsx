@@ -14,7 +14,7 @@ interface PaywallModalProps {
   levelName: string;
 }
 
-const PaywallModal = ({ isOpen, onClose, level, levelName }: PaywallModalProps) => {
+const PaywallModal = ({ isOpen, onClose, level, levelName: _levelName }: PaywallModalProps) => {
   const { initiateCheckout } = useLemonSqueezy();
   const activateLicenseKey = useGameStore((state) => state.activateLicenseKey);
 

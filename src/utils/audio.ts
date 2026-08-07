@@ -13,7 +13,7 @@ const initAudio = () => {
   }
 };
 
-export const toggleMute = (muted: boolean) => {
+export const toggleMute = (_muted: boolean) => {
   // Kept for backward compatibility, but state is now read directly from useGameStore
 };
 
