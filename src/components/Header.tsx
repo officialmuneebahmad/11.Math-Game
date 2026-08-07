@@ -333,6 +333,49 @@ const Header = () => {
 
               <div className="h-px bg-slate-100 dark:bg-slate-800" />
 
+              {/* Powers */}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Powers</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {isPaid ? 'Unlimited Powers' : `${powers} powers left today`}
+                  </span>
+                </div>
+                <div
+                  onClick={() => { if (!isPaid) { setMenuOpen(false); setPaywallOpen(true); } }}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl cursor-pointer transition-colors ${
+                    isPaid
+                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+                      : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200'
+                  }`}
+                >
+                  <BatteryCharging size={18} className={isPaid ? 'animate-pulse' : ''} />
+                  <span className="font-bold text-sm">{isPaid ? '\u221E' : powers}</span>
+                </div>
+              </div>
+
+              <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+              {/* Loves */}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Loves</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {isPaid ? 'Unlimited hearts' : `${loveCount}/3 loves used`}
+                  </span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  onClick={handleLoveClick}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 hover:bg-rose-200 dark:hover:bg-rose-900/50 transition-colors"
+                >
+                  <Heart size={18} className="fill-current" />
+                  <span className="font-bold text-sm">{loveCount}</span>
+                </motion.button>
+              </div>
+
+              <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
               {/* Theme Toggle */}
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
