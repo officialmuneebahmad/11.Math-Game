@@ -92,6 +92,27 @@ const BrainMathLogo = () => (
   </svg>
 );
 
+// Animated Hamburger Icon
+const HamburgerIcon = ({ open }: { open: boolean }) => (
+  <div className="w-6 h-5 flex flex-col justify-between cursor-pointer">
+    <motion.span
+      animate={open ? { rotate: 45, y: 9 } : { rotate: 0, y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeInOut' }}
+      className="block h-0.5 w-full bg-slate-700 dark:bg-slate-300 rounded-full origin-center"
+    />
+    <motion.span
+      animate={open ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+      transition={{ duration: 0.2 }}
+      className="block h-0.5 w-full bg-slate-700 dark:bg-slate-300 rounded-full"
+    />
+    <motion.span
+      animate={open ? { rotate: -45, y: -9 } : { rotate: 0, y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeInOut' }}
+      className="block h-0.5 w-full bg-slate-700 dark:bg-slate-300 rounded-full origin-center"
+    />
+  </div>
+);
+
 const Header = () => {
   const {
     points, streak, loveCount, incrementLove,
@@ -99,6 +120,7 @@ const Header = () => {
   } = useGameStore();
 
   const [paywallOpen, setPaywallOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -108,6 +130,13 @@ const Header = () => {
       root.classList.remove('dark');
     }
   }, [theme, isPaid]);
+
+  // Close menu on resize to desktop
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 640) setMenuOpen(false); };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const handleLoveClick = () => {
     playSound.loveTap();
@@ -126,7 +155,6 @@ const Header = () => {
     }
     const next = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
-    // Apply immediately to DOM without waiting for the effect
     if (next === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -142,34 +170,41 @@ const Header = () => {
   const effectiveTheme = isPaid ? theme : 'light';
   const isDark = effectiveTheme === 'dark';
 
+  // User badge element (reused in both desktop and mobile menu)
+  const UserBadge = () => (
+    <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
+      isPaid
+        ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-sm'
+        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+    }`}>
+      {isPaid
+        ? <><Crown size={11} className="fill-white" /><span>PRO</span></>
+        : <><UserRound size={11} /><span>FREE</span></>
+      }
+    </div>
+  );
+
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 shadow-sm">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 
+        {/* Logo */}
         <Tooltip label="MathStreak Home" direction="below">
           <Link to="/" className="flex items-center gap-2.5 group" onClick={() => playSound.tap()}>
             <div className="group-hover:scale-105 transition-transform duration-200">
               <BrainMathLogo />
             </div>
-            <span className="font-extrabold text-xl tracking-tight hidden sm:block bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">
+            <span className="font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">
               MathStreak
             </span>
           </Link>
         </Tooltip>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Desktop Nav Items */}
+        <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
 
           <Tooltip label={isPaid ? 'Pro Member - All features unlocked' : 'Free User - Upgrade for unlimited access'} direction="below">
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
-              isPaid
-                ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-sm'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
-            }`}>
-              {isPaid
-                ? <><Crown size={11} className="fill-white" /><span>PRO</span></>
-                : <><UserRound size={11} /><span>FREE</span></>
-              }
-            </div>
+            <UserBadge />
           </Tooltip>
 
           <Tooltip label={isPaid ? 'Unlimited Powers - Play as much as you want!' : `${powers} powers left today (resets daily)`} direction="below">
@@ -249,7 +284,104 @@ const Header = () => {
             </button>
           </Tooltip>
         </div>
+
+        {/* Mobile: stat pills + burger button */}
+        <div className="flex sm:hidden items-center gap-2">
+          {/* Keep streak & points visible on mobile */}
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-orange-100 text-orange-600 text-xs font-bold">
+            <Zap size={12} className="fill-current" />
+            {streak}
+          </div>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-100 text-yellow-600 text-xs font-bold">
+            <Award size={12} className="fill-current" />
+            {points}
+          </div>
+
+          {/* Burger button */}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Toggle menu"
+          >
+            <HamburgerIcon open={menuOpen} />
+          </button>
+        </div>
       </div>
+
+      {/* Mobile slide-down menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: 'easeInOut' }}
+            className="sm:hidden overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800"
+          >
+            <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col gap-3">
+
+              {/* User Status */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Account</span>
+                <button
+                  onClick={() => { setMenuOpen(false); setPaywallOpen(true); }}
+                  className="flex-shrink-0"
+                >
+                  <UserBadge />
+                </button>
+              </div>
+
+              <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+              {/* Theme Toggle */}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    {isDark ? 'Dark Mode' : 'Light Mode'}
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {!isPaid ? 'PRO feature – upgrade to unlock' : 'Click to switch theme'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => { toggleTheme(); }}
+                  className={`p-2.5 rounded-xl transition-colors relative ${
+                    !isPaid
+                      ? 'text-slate-400 bg-slate-100 dark:bg-slate-800 opacity-60'
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800'
+                  }`}
+                >
+                  {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                  {!isPaid && (
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center">
+                      <Crown size={7} className="text-white fill-white" />
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+              {/* Volume */}
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    {isMuted ? 'Sound Off' : 'Sound On'}
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Tap to toggle audio</span>
+                </div>
+                <button
+                  onClick={() => { handleMuteToggle(); }}
+                  className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                >
+                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
+              </div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <PaywallModal
         isOpen={paywallOpen}
