@@ -1,20 +1,11 @@
-import { useGameStore, type Level } from '../store/useGameStore';
+import { type Level } from '../store/useGameStore';
+
+const POLAR_CHECKOUT_URL = 'https://buy.polar.sh/polar_cl_LFcFealIdDsd9JyHrHgaeGr4wkEOsXeIime1c23Zwpi';
 
 export const useLemonSqueezy = () => {
 
-  const unlockLevel = useGameStore((state) => state.unlockLevel);
-
-  const initiateCheckout = (level: Level, isBundle: boolean = false) => {
-    setTimeout(() => {
-      alert(`Polar.sh: Simulation checkout for ${isBundle ? 'All Levels' : level} successful! A mock license key has been generated.`);
-      if (isBundle) {
-        unlockLevel('easy');
-        unlockLevel('medium');
-        unlockLevel('hard');
-      } else {
-        unlockLevel(level);
-      }
-    }, 1500);
+  const initiateCheckout = (_level: Level, _isBundle: boolean = false) => {
+    window.open(POLAR_CHECKOUT_URL, '_blank', 'noopener,noreferrer');
   };
 
   return { initiateCheckout };
